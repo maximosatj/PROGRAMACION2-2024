@@ -54,15 +54,34 @@ const Exam = ({ route, navigation }) => {
   // Enviar las respuestas al backend
   const handleSubmit = async () => {
     try {
-      // Asegúrate de que el endpoint para enviar respuestas esté definido
-      await axios.post('http://192.168.18.213:8080/answers', answers);
+      // Formatea las respuestas en el formato esperado
+      const formattedAnswers = {
+        examId: route.params.examId, // Asegúrate de que este ID esté disponible
+        responses: Object.keys(answers).map(questionId => ({
+          questionId: questionId,
+          answerId: answers[questionId]
+        }))
+      };
+  
+      // Muestra los datos en la consola para verificar el formato
+      console.log('Datos enviados:', formattedAnswers);
+  
+      // Envía las respuestas al servidor
+      const response = await axios.post('http://192.168.18.213:8080/user-answers', formattedAnswers);
+  
+      // Muestra la respuesta del servidor en la consola
+      console.log('Respuesta del servidor:', response.data);
+  
       Alert.alert('Éxito', 'Respuestas enviadas con éxito');
       navigation.navigate('Home'); // Navega de vuelta a la pantalla HomeScreen
     } catch (error) {
-      console.error('Error submitting answers:', error);
+      // Muestra el error en la consola para depuración
+      console.error('Error submitting answers:', error.response ? error.response.data : error.message);
       Alert.alert('Error', 'No se pudieron enviar las respuestas');
     }
   };
+  
+
 
   if (loading) {
     return <View><Text>Cargando preguntas...</Text></View>;
