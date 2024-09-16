@@ -2,6 +2,7 @@ package com.example.Exams.Client;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication; // Import necesario
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -20,7 +21,6 @@ public class ClientController {
         System.out.println("Clients: " + clients); // Verifica el contenido
         return ResponseEntity.ok(clients);
     }
-
 
     @GetMapping("/{id}")
     public ResponseEntity<Client> getClientById(@PathVariable("id") Long id) {
@@ -54,4 +54,15 @@ public class ClientController {
             return ResponseEntity.notFound().build();
         }
     }
+
+    // Obtener el cliente actual autenticado
+    @GetMapping("/me")
+    public ResponseEntity<Client> getCurrentClient(Authentication authentication) {
+        String clientEmail = authentication.getName(); // El email del cliente autenticado
+        Optional<Client> client = clientService.getClientByEmail(clientEmail);
+
+        return client.map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
 }

@@ -2,18 +2,29 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
 import axios from 'axios';
 import { Picker } from '@react-native-picker/picker';
-import HomeScreen from './HomeScreen';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const Exam = ({ route, navigation }) => {
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState({});
+  const [answerOptions, setAnswerOptions] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // Obtén las preguntas cuando la pantalla se monta
   useEffect(() => {
     const fetchQuestions = async () => {
       try {
-        const response = await axios.get('http://192.168.18.213:8080/questions');
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+          Alert.alert('Error', 'No se encontró el token de autenticación');
+          return;
+        }
+
+        const response = await axios.get('http://192.168.18.213:8080/questions', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setQuestions(response.data);
         setLoading(false);
       } catch (error) {
@@ -27,12 +38,20 @@ const Exam = ({ route, navigation }) => {
   }, []);
 
   // Obtén las respuestas posibles
-  const [answerOptions, setAnswerOptions] = useState([]);
-
   useEffect(() => {
     const fetchAnswers = async () => {
       try {
-        const response = await axios.get('http://192.168.18.213:8080/answers');
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+          Alert.alert('Error', 'No se encontró el token de autenticación');
+          return;
+        }
+
+        const response = await axios.get('http://192.168.18.213:8080/answers', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setAnswerOptions(response.data);
       } catch (error) {
         console.error('Error fetching answers:', error);
@@ -47,31 +66,41 @@ const Exam = ({ route, navigation }) => {
   const handleAnswerChange = (questionId, answerId) => {
     setAnswers(prevAnswers => ({
       ...prevAnswers,
-      [questionId]: answerId
+      [questionId]: answerId,
     }));
   };
 
   // Enviar las respuestas al backend
   const handleSubmit = async () => {
     try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        Alert.alert('Error', 'No se encontró el token de autenticación');
+        return;
+      }
+
       // Formatea las respuestas en el formato esperado
       const formattedAnswers = {
         examId: route.params.examId, // Asegúrate de que este ID esté disponible
         responses: Object.keys(answers).map(questionId => ({
           questionId: questionId,
-          answerId: answers[questionId]
-        }))
+          answerId: answers[questionId],
+        })),
       };
-  
+
       // Muestra los datos en la consola para verificar el formato
       console.log('Datos enviados:', formattedAnswers);
-  
+
       // Envía las respuestas al servidor
-      const response = await axios.post('http://192.168.18.213:8080/user-answers', formattedAnswers);
-  
+      const response = await axios.post('http://192.168.18.213:8080/user-answers', formattedAnswers, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
       // Muestra la respuesta del servidor en la consola
       console.log('Respuesta del servidor:', response.data);
-  
+
       Alert.alert('Éxito', 'Respuestas enviadas con éxito');
       navigation.navigate('Home'); // Navega de vuelta a la pantalla HomeScreen
     } catch (error) {
@@ -80,8 +109,6 @@ const Exam = ({ route, navigation }) => {
       Alert.alert('Error', 'No se pudieron enviar las respuestas');
     }
   };
-  
-
 
   if (loading) {
     return <View><Text>Cargando preguntas...</Text></View>;

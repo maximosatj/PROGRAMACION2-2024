@@ -1,6 +1,7 @@
 package com.example.Exams.Client;
 
 import com.example.Exams.Exam.Exam;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -12,6 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "clients")
+@JsonInclude(JsonInclude.Include.NON_NULL) // Esto evita incluir campos nulos en el JSON
 public class Client implements UserDetails {
 
     @Id
@@ -83,7 +85,6 @@ public class Client implements UserDetails {
         }
     }
 
-
     // Getters y Setters
     public Long getId() {
         return id;
@@ -136,7 +137,7 @@ public class Client implements UserDetails {
     // Métodos necesarios para implementar UserDetails
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        return List.of(new SimpleGrantedAuthority(role != null ? role.name() : "UNKNOWN"));
     }
 
     @Override

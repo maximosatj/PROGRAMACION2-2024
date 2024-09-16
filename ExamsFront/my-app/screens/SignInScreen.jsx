@@ -1,24 +1,40 @@
-import { View, Text, Image, TextInput, TouchableOpacity } from 'react-native';
+import { View, Text, Image, TextInput, TouchableOpacity, Alert } from 'react-native';
 import React, { useState } from 'react';
 import { useNavigation } from '@react-navigation/native';
 import BackButton from '../components/backButton';
 import ScreenWrapper from '../components/ScreenWrapper';
 import { colors } from '../theme';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export default function SignInScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
   const navigation = useNavigation();
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (email && password) {
-      // good to go
-      navigation.goBack();
-      navigation.navigate('Welcome');
+      try {
+        const response = await fetch('http://192.168.18.213:8080/auth/login', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ username: email, password }),
+        });
+
+        if (response.ok) {
+          const { token } = await response.json();
+          await AsyncStorage.setItem('token', token);
+          navigation.navigate('Home');
+        } else {
+          Alert.alert('Login Failed', 'Invalid email or password.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        Alert.alert('Login Failed', 'An error occurred. Please try again.');
+      }
     } else {
-      // show error
+      Alert.alert('Error', 'Please fill in all fields.');
     }
   };
 
@@ -39,14 +55,14 @@ export default function SignInScreen() {
             <Text className={`${colors.heading} text-lg font-bold`}>Email</Text>
             <TextInput
               value={email}
-              onChangeText={value => setEmail(value)}
+              onChangeText={setEmail}
               className="p-4 bg-white rounded-full mb-5"
             />
             <Text className={`${colors.heading} text-lg font-bold`}>Password</Text>
             <TextInput
               value={password}
               secureTextEntry
-              onChangeText={value => setPassword(value)}
+              onChangeText={setPassword}
               className="p-4 bg-white rounded-full mb-5"
             />
             <TouchableOpacity className="flex-row justify-end">

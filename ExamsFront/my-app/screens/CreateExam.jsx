@@ -2,20 +2,30 @@ import React, { useState, useEffect } from 'react';
 import { View, TextInput, Button, Alert, StyleSheet } from 'react-native';
 import axios from 'axios';
 import { Picker } from '@react-native-picker/picker';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const CreateExam = ({ navigation }) => {
   const [companyName, setCompanyName] = useState('');
   const [examDate, setExamDate] = useState('');
   const [previousExam, setPreviousExam] = useState(false);
   const [clientId, setClientId] = useState('');
+  const [clientName, setClientName] = useState('');
   const [clients, setClients] = useState([]);
 
-  // Función para obtener los clientes
   useEffect(() => {
     const fetchClients = async () => {
       try {
-        const response = await axios.get('http://192.168.18.213:8080/client/getall');
-        console.log("Response data:", response.data); // Verifica la respuesta
+        const token = await AsyncStorage.getItem('token');
+        if (!token) {
+          Alert.alert('Error', 'No se encontró el token de autenticación');
+          return;
+        }
+
+        const response = await axios.get('http://192.168.18.213:8080/client/getall', {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
 
         if (Array.isArray(response.data)) {
           const simplifiedClients = response.data.map(client => ({
@@ -30,14 +40,22 @@ const CreateExam = ({ navigation }) => {
         }
       } catch (error) {
         console.error('Error obteniendo los clientes:', error.response || error.message);
-        Alert.alert('Error', 'No se pudieron obtener los clientes');
+        if (error.response) {
+          const { status, data } = error.response;
+          if (status === 403) {
+            Alert.alert('Error', 'Acceso prohibido. Verifica tu token de autenticación.');
+          } else {
+            Alert.alert('Error', `Error al obtener los clientes: ${data.message || error.message}`);
+          }
+        } else {
+          Alert.alert('Error', 'Error desconocido al obtener los clientes.');
+        }
       }
     };
 
     fetchClients();
   }, []);
 
-  // Función para enviar los datos del examen al backend
   const handleSubmit = async () => {
     if (!companyName || !examDate || clientId === '') {
       Alert.alert('Error', 'Por favor, completa todos los campos');
@@ -45,28 +63,50 @@ const CreateExam = ({ navigation }) => {
     }
 
     try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) {
+        Alert.alert('Error', 'No se encontró el token de autenticación');
+        return;
+      }
+
+      console.log("Enviando datos:", {
+        companyName,
+        examDate,
+        previousExam,
+        client: { id: Number(clientId) }
+      });
+
       const response = await axios.post('http://192.168.18.213:8080/exams', {
         companyName,
         examDate,
         previousExam,
-        client: { id: Number(clientId) }, // Convierte el ID a número
+        client: { id: Number(clientId) },
+      }, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      // Obtener el ID del examen creado
       const examId = response.data.id;
-
-      // Redirigir a la pantalla Exam con el ID del examen
       navigation.navigate('Exam', { examId });
 
       Alert.alert('Éxito', 'Examen creado con éxito');
-      // Limpia los campos después de la creación
       setCompanyName('');
       setExamDate('');
       setClientId('');
       setPreviousExam(false);
     } catch (error) {
       console.error('Error creando el examen:', error.response || error.message);
-      Alert.alert('Error', 'No se pudo crear el examen');
+      if (error.response) {
+        const { status, data } = error.response;
+        if (status === 403) {
+          Alert.alert('Error', 'Acceso prohibido. Verifica tu token de autenticación.');
+        } else {
+          Alert.alert('Error', `Error al crear el examen: ${data.message || error.message}`);
+        }
+      } else {
+        Alert.alert('Error', 'Error desconocido al crear el examen.');
+      }
     }
   };
 
@@ -86,7 +126,11 @@ const CreateExam = ({ navigation }) => {
       />
       <Picker
         selectedValue={clientId}
-        onValueChange={(itemValue) => setClientId(itemValue)}
+        onValueChange={(itemValue) => {
+          setClientId(itemValue);
+          const selectedClient = clients.find(client => client.id.toString() === itemValue);
+          setClientName(selectedClient ? selectedClient.name : '');
+        }}
         style={styles.picker}
       >
         <Picker.Item label="Seleccione un cliente" value="" />

@@ -37,6 +37,11 @@ public class ClientService {
         }
     }
 
+    public Optional<Client> getClientByEmail(String email) {
+        return clientRepository.findByEmail(email);
+    }
+
+
     public Client updateClient(Client request, Long id) {
         Optional<Client> client = clientRepository.findById(id);
         if (client.isPresent()) {

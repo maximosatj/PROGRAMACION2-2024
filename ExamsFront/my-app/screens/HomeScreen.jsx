@@ -21,6 +21,10 @@ export default function HomeScreen() {
         navigation.navigate('CreateExam');
     };
 
+    const handleMyExamsPress = () => {
+        navigation.navigate('MyExams'); // Navegar a MyExams.jsx
+    };
+
     return (
         <ScreenWrapper className="flex-1">
             <View className="flex-row justify-between">
@@ -34,7 +38,7 @@ export default function HomeScreen() {
             </View>
             <View className="px-4 space-y-3">
                 <View className="flex-row justify-between items-center">
-                    <Text class="font-bold text-3xl text-gray-900">¿Que son las 5s?</Text>
+                    <Text class="font-bold text-3xl text-gray-900">¿Qué son las 5S?</Text>
                     <TouchableOpacity onPress={handleCreateExamPress} className="p-2 bg-white border border-gray-300 rounded-full">
                         <Text className="text-gray-900">Crear Examen</Text>
                     </TouchableOpacity>
@@ -62,6 +66,13 @@ export default function HomeScreen() {
                         )}
                     />
                 </View>
+                {/* Botón para ir a la pantalla MyExams */}
+                <TouchableOpacity 
+                    onPress={handleMyExamsPress}
+                    className="p-3 bg-blue-500 rounded-lg shadow-lg"
+                    style={{ marginTop: 16 }}>
+                    <Text className="text-white font-bold text-center">Ver Mis Exámenes</Text>
+                </TouchableOpacity>
             </View>
         </ScreenWrapper>
     );
