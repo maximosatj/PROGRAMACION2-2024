@@ -1,10 +1,17 @@
-
 package com.example.Exams.Answer;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "answers")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class Answer {
 
     @Id
@@ -13,38 +20,4 @@ public class Answer {
 
     private int score; // Puntuación de la respuesta
     private String answerText; // Texto de la respuesta
-
-    public Answer() {
-    }
-
-    public Answer(Long id, int score, String answerText) {
-        this.id = id;
-        this.score = score;
-        this.answerText = answerText;
-    }
-
-    // Getters y Setters
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public int getScore() {
-        return score;
-    }
-
-    public void setScore(int score) {
-        this.score = score;
-    }
-
-    public String getAnswerText() {
-        return answerText;
-    }
-
-    public void setAnswerText(String answerText) {
-        this.answerText = answerText;
-    }
 }

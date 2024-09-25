@@ -19,8 +19,8 @@ const Exam = ({ route, navigation }) => {
           Alert.alert('Error', 'No se encontró el token de autenticación');
           return;
         }
-
-        const response = await axios.get('http://192.168.18.213:8080/questions', {
+        ////https://10.51.7.90:8080/questions,http://192.168.18.213:8080/questions
+        const response = await axios.get('https://10.51.7.90:8080/questions', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -46,8 +46,8 @@ const Exam = ({ route, navigation }) => {
           Alert.alert('Error', 'No se encontró el token de autenticación');
           return;
         }
-
-        const response = await axios.get('http://192.168.18.213:8080/answers', {
+        ///https://10.51.7.90:8080/answers,http://192.168.18.213:8080/answers
+        const response = await axios.get('https://10.51.7.90:8080/answers', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -92,7 +92,8 @@ const Exam = ({ route, navigation }) => {
       console.log('Datos enviados:', formattedAnswers);
 
       // Envía las respuestas al servidor
-      const response = await axios.post('http://192.168.18.213:8080/user-answers', formattedAnswers, {
+      ///https://10.51.7.90:8080/user-answers,http://192.168.18.213:8080/user-answers
+      const response = await axios.post('https://10.51.7.90:8080/user-answers', formattedAnswers, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

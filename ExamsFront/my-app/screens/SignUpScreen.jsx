@@ -16,8 +16,9 @@ export default function SignUpScreen() {
 
   const handleSubmit = async () => {
     if (email && password && firstname && lastname && country) {
+      ///https://10.51.7.90:8080/auth/register,http://192.168.18.213:8080/auth/register
       try {
-        const response = await fetch('http://192.168.18.213:8080/auth/register', {
+        const response = await fetch('https://10.51.7.90:8080/auth/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

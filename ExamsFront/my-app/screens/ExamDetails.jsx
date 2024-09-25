@@ -19,7 +19,9 @@ export default function ExamDetails() {
                     return;
                 }
 
-                const response = await axios.get(`http://192.168.18.213:8080/exams/${examId}`, {
+          
+                ///https://10.51.7.90:8080/exams/${examId},http://192.168.18.213:8080/exams/${examId}
+                const response = await axios.get(`https://10.51.7.90:8080/exams/${examId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`, // Incluye el token en el encabezado
                     },

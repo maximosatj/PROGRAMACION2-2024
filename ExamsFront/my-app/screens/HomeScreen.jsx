@@ -1,20 +1,21 @@
-import { View, Text, TouchableOpacity, Image } from 'react-native';
-import React from 'react';
+import { View, Text, TouchableOpacity, Image, Modal } from 'react-native';
+import React, { useState } from 'react';
 import ScreenWrapper from "../components/ScreenWrapper";
 import { FlatList } from 'react-native-gesture-handler';
 import EmptyList from '../components/emptyList';
 import { useNavigation } from '@react-navigation/native';
-import { tailwind } from 'nativewind'; // Importa el helper tailwind
 
 const items = [
-    { id: '1', place: 'Seiri', country: 'Clasificar' },
-    { id: '2', place: 'Seiton', country: 'Poner en orden' },
-    { id: '3', place: 'Seiso', country: 'Pulir' },
-    { id: '4', place: 'Seiketsu', country: 'Estandarizar' },
-    { id: '5', place: 'Shitsuke', country: 'Mantener' },
+    { id: '1', place: 'Seiri', country: 'Clasificar', description: 'Separar lo necesario de lo innecesario.' },
+    { id: '2', place: 'Seiton', country: 'Poner en orden', description: 'Organizar los elementos para fácil acceso.' },
+    { id: '3', place: 'Seiso', country: 'Pulir', description: 'Mantener el lugar limpio y en orden.' },
+    { id: '4', place: 'Seiketsu', country: 'Estandarizar', description: 'Crear estándares para mantener la limpieza.' },
+    { id: '5', place: 'Shitsuke', country: 'Mantener', description: 'Asegurar el cumplimiento y la disciplina.' },
 ];
 
 export default function HomeScreen() {
+    const [selectedItem, setSelectedItem] = useState(null); // Estado para manejar el ítem seleccionado
+    const [modalVisible, setModalVisible] = useState(false); // Estado para manejar la visibilidad del modal
     const navigation = useNavigation();
 
     const handleCreateExamPress = () => {
@@ -22,7 +23,17 @@ export default function HomeScreen() {
     };
 
     const handleMyExamsPress = () => {
-        navigation.navigate('MyExams'); // Navegar a MyExams.jsx
+        navigation.navigate('MyExams');
+    };
+
+    const openModal = (item) => {
+        setSelectedItem(item);
+        setModalVisible(true);
+    };
+
+    const closeModal = () => {
+        setModalVisible(false);
+        setSelectedItem(null);
     };
 
     return (
@@ -53,7 +64,10 @@ export default function HomeScreen() {
                         columnWrapperStyle={{ justifyContent: 'space-between' }}
                         style={{ marginHorizontal: 4 }}
                         renderItem={({ item }) => (
-                            <TouchableOpacity className="bg-white p-3 rounded-xl mb-6 shadow-sm">
+                            <TouchableOpacity 
+                                className="bg-white p-3 rounded-xl mb-6 shadow-sm"
+                                onPress={() => openModal(item)} // Al presionar, abre el modal con el ítem seleccionado
+                            >
                                 <View>
                                     <Image 
                                         source={require('../images/Design/Design/1.png')} 
@@ -66,7 +80,6 @@ export default function HomeScreen() {
                         )}
                     />
                 </View>
-                {/* Botón para ir a la pantalla MyExams */}
                 <TouchableOpacity 
                     onPress={handleMyExamsPress}
                     className="p-3 bg-blue-500 rounded-lg shadow-lg"
@@ -74,6 +87,29 @@ export default function HomeScreen() {
                     <Text className="text-white font-bold text-center">Ver Mis Exámenes</Text>
                 </TouchableOpacity>
             </View>
+
+            {/* Modal para mostrar más información */}
+            {selectedItem && (
+                <Modal
+                    visible={modalVisible}
+                    transparent={true}
+                    animationType="slide"
+                    onRequestClose={closeModal} // Cerrar el modal al presionar atrás
+                >
+                    <View className="flex-1 justify-center items-center bg-white bg-opacity-50">
+                        <View className="bg-white p-6 rounded-lg w-3/4">
+                            <Text className="font-bold text-xl text-gray-900">{selectedItem.place}</Text>
+                            <Text className="text-gray-600 mt-2">{selectedItem.description}</Text>
+                            <TouchableOpacity 
+                                onPress={closeModal}
+                                className="p-3 bg-blue-500 rounded-lg shadow-lg mt-4"
+                            >
+                                <Text className="text-white font-bold text-center">Cerrar</Text>
+                            </TouchableOpacity>
+                        </View>
+                    </View>
+                </Modal>
+            )}
         </ScreenWrapper>
     );
 }

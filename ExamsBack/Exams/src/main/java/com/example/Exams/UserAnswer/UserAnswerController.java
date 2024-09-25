@@ -42,6 +42,16 @@ public class UserAnswerController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    // Nueva ruta para obtener las respuestas de un examen específico
+    @GetMapping("/exam/{examId}")
+    public ResponseEntity<List<UserAnswer>> getUserAnswersByExamId(@PathVariable Long examId) {
+        List<UserAnswer> userAnswers = userAnswerService.getUserAnswersByExamId(examId);
+        if (userAnswers.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+        return new ResponseEntity<>(userAnswers, HttpStatus.OK);
+    }
+
     @PostMapping
     public ResponseEntity<?> createUserAnswers(@RequestBody UserAnswerRequest request) {
         try {

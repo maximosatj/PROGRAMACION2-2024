@@ -20,8 +20,8 @@ const CreateExam = ({ navigation }) => {
           Alert.alert('Error', 'No se encontró el token de autenticación');
           return;
         }
-
-        const response = await axios.get('http://192.168.18.213:8080/client/getall', {
+        //https://10.51.7.90:8080/client/getall,http://192.168.18.213:8080/client/getall
+        const response = await axios.get('https://10.51.7.90:8080/client/getall', {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -75,8 +75,8 @@ const CreateExam = ({ navigation }) => {
         previousExam,
         client: { id: Number(clientId) }
       });
-
-      const response = await axios.post('http://192.168.18.213:8080/exams', {
+      //https://10.51.7.90:8080/exams,http://192.168.18.213:8080/exams
+      const response = await axios.post('https://10.51.7.90:8080/exams', {
         companyName,
         examDate,
         previousExam,

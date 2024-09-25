@@ -14,14 +14,15 @@ export default function MyExams() {
 
     useEffect(() => {
         const fetchExams = async () => {
+            // 10.51.7.90
             try {
                 const token = await AsyncStorage.getItem('token');
                 if (!token) {
                     Alert.alert('Error', 'No se encontró el token de autenticación');
                     return;
                 }
-
-                const response = await axios.get('http://192.168.18.213:8080/exams', {
+                ///https://10.51.7.90:8080/exams,http://192.168.18.213:8080/exams
+                const response = await axios.get('https://10.51.7.90:8080/exams', {
                     headers: {
                         'Authorization': `Bearer ${token}`, // Incluye el token en el encabezado
                     },

@@ -24,6 +24,11 @@ public class UserAnswerService {
         return userAnswerRepository.save(userAnswer);
     }
 
+    // Nuevo método para obtener respuestas por examen
+    public List<UserAnswer> getUserAnswersByExamId(Long examId) {
+        return userAnswerRepository.findByExamId(examId);
+    }
+
     public Optional<UserAnswer> updateUserAnswer(Long id, UserAnswer userAnswerDetails) {
         if (userAnswerRepository.existsById(id)) {
             userAnswerDetails.setId(id);
